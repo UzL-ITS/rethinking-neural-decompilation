@@ -1,0 +1,61 @@
+Checking first 10 samples
+
+====================================================================================================
+Sample idx=0 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=4 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=8 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=12 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=16 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=20 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=23 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=26 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=30 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Sample idx=34 opt=O0 compiling=0/96
+No compiling candidates
+
+====================================================================================================
+Summary
+oracle                  :   0/  0 =   0.0%
+random                  :   0/  0 =   0.0%
+mbr_consensus           :   0/  0 =   0.0%
+execution_guided        :   0/  0 =   0.0%
+edit_similarity         :   0/  0 =   0.0%
+token_f1                :   0/  0 =   0.0%
+bigram_sim              :   0/  0 =   0.0%
+trigram_sim             :   0/  0 =   0.0%
+ast_node_sim            :   0/  0 =   0.0%
+control_flow_sim        :   0/  0 =   0.0%
+identifier_sim          :   0/  0 =   0.0%
+unixcoder_base          :   0/  0 =   0.0%
+unixcoder_finetuned     :   0/  0 =   0.0%
+neg_perplexity          :   0/  0 =   0.0%
+ensemble_text           :   0/  0 =   0.0%
+ensemble_unixcoder_ft   :   0/  0 =   0.0%
+ensemble_perplexity     :   0/  0 =   0.0%

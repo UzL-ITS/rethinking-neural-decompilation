@@ -1,0 +1,57 @@
+{
+  "mbr_consensus": {
+    "correct": 452,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "edit_similarity": {
+    "correct": 405,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "token_f1": {
+    "correct": 401,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "bigram_sim": {
+    "correct": 432,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "trigram_sim": {
+    "correct": 436,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "ast_node_sim": {
+    "correct": 401,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "control_flow_sim": {
+    "correct": 391,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "identifier_sim": {
+    "correct": 388,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "length_ratio": {
+    "correct": 417,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "random": {
+    "correct": 432,
+    "total": 646,
+    "no_candidates": 10
+  },
+  "oracle": {
+    "correct": 603,
+    "total": 646,
+    "no_candidates": 10
+  }
+}

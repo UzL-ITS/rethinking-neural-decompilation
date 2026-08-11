@@ -1,0 +1,158 @@
+{
+  "config": {
+    "num_samples": 656,
+    "num_candidates": 100,
+    "random_seed": 42
+  },
+  "results": [
+    {
+      "method": "oracle",
+      "pass_rate": 93.8871473354232,
+      "correct": 599,
+      "total": 638,
+      "levenshtein": 58.260439568792975,
+      "codebleu": 41.94903749210474
+    },
+    {
+      "method": "ensemble_perplexity",
+      "pass_rate": 73.51097178683386,
+      "correct": 469,
+      "total": 638,
+      "levenshtein": 57.96546434133742,
+      "codebleu": 43.94222135739359
+    },
+    {
+      "method": "execution_guided",
+      "pass_rate": 72.10031347962382,
+      "correct": 460,
+      "total": 638,
+      "levenshtein": 58.19442039999315,
+      "codebleu": 41.83379789165713
+    },
+    {
+      "method": "neg_perplexity",
+      "pass_rate": 71.9435736677116,
+      "correct": 459,
+      "total": 638,
+      "levenshtein": 57.39197326361175,
+      "codebleu": 43.70867623330741
+    },
+    {
+      "method": "mbr_consensus",
+      "pass_rate": 71.63009404388715,
+      "correct": 457,
+      "total": 638,
+      "levenshtein": 58.84855061252521,
+      "codebleu": 42.25802378684482
+    },
+    {
+      "method": "random",
+      "pass_rate": 69.27899686520375,
+      "correct": 442,
+      "total": 638,
+      "levenshtein": 55.78568480003454,
+      "codebleu": 40.801743311798774
+    },
+    {
+      "method": "repe_correctness",
+      "pass_rate": 69.27899686520375,
+      "correct": 442,
+      "total": 638,
+      "levenshtein": 57.045648462151135,
+      "codebleu": 43.257856697964776
+    },
+    {
+      "method": "trigram_sim",
+      "pass_rate": 68.65203761755487,
+      "correct": 438,
+      "total": 638,
+      "levenshtein": 52.48172349356251,
+      "codebleu": 38.47275800917188
+    },
+    {
+      "method": "ensemble_text",
+      "pass_rate": 66.14420062695925,
+      "correct": 422,
+      "total": 638,
+      "levenshtein": 51.890063212554914,
+      "codebleu": 37.76876842023674
+    },
+    {
+      "method": "ensemble_unixcoder_ft",
+      "pass_rate": 66.14420062695925,
+      "correct": 422,
+      "total": 638,
+      "levenshtein": 52.62399186288357,
+      "codebleu": 38.37807017424471
+    },
+    {
+      "method": "ast_node_sim",
+      "pass_rate": 65.67398119122258,
+      "correct": 419,
+      "total": 638,
+      "levenshtein": 49.35847259374507,
+      "codebleu": 33.985480235569575
+    },
+    {
+      "method": "unixcoder_finetuned",
+      "pass_rate": 65.36050156739812,
+      "correct": 417,
+      "total": 638,
+      "levenshtein": 52.51593820153248,
+      "codebleu": 38.086795285704476
+    },
+    {
+      "method": "edit_similarity",
+      "pass_rate": 64.89028213166145,
+      "correct": 414,
+      "total": 638,
+      "levenshtein": 51.245169014167814,
+      "codebleu": 37.75558857593618
+    },
+    {
+      "method": "bigram_sim",
+      "pass_rate": 64.57680250783699,
+      "correct": 412,
+      "total": 638,
+      "levenshtein": 52.16009187405648,
+      "codebleu": 37.88095683338142
+    },
+    {
+      "method": "token_f1",
+      "pass_rate": 63.479623824451416,
+      "correct": 405,
+      "total": 638,
+      "levenshtein": 52.31598852933724,
+      "codebleu": 37.59319795055841
+    },
+    {
+      "method": "unixcoder_base",
+      "pass_rate": 63.16614420062696,
+      "correct": 403,
+      "total": 638,
+      "levenshtein": 49.30649063307362,
+      "codebleu": 36.09511570917849
+    },
+    {
+      "method": "identifier_sim",
+      "pass_rate": 59.87460815047022,
+      "correct": 382,
+      "total": 638,
+      "levenshtein": 55.01405640196988,
+      "codebleu": 38.558016341042055
+    },
+    {
+      "method": "control_flow_sim",
+      "pass_rate": 58.93416927899686,
+      "correct": 376,
+      "total": 638,
+      "levenshtein": 47.93446325007707,
+      "codebleu": 34.18438428739279
+    }
+  ],
+  "metrics_description": {
+    "pass_rate": "Percentage of samples where selected candidate passes all tests",
+    "levenshtein": "Average Levenshtein similarity to original source (%)",
+    "codebleu": "Average CodeBLEU score comparing to original source (%)"
+  }
+}

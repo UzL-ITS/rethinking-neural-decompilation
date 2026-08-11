@@ -1,0 +1,70 @@
+{
+  "mbr_consensus": {
+    "correct": 332,
+    "total": 641
+  },
+  "execution_guided": {
+    "correct": 324,
+    "total": 641
+  },
+  "edit_similarity": {
+    "correct": 276,
+    "total": 641
+  },
+  "token_f1": {
+    "correct": 274,
+    "total": 641
+  },
+  "bigram_sim": {
+    "correct": 280,
+    "total": 641
+  },
+  "trigram_sim": {
+    "correct": 322,
+    "total": 641
+  },
+  "ast_node_sim": {
+    "correct": 250,
+    "total": 641
+  },
+  "control_flow_sim": {
+    "correct": 225,
+    "total": 641
+  },
+  "identifier_sim": {
+    "correct": 296,
+    "total": 641
+  },
+  "unixcoder_base": {
+    "correct": 245,
+    "total": 641
+  },
+  "unixcoder_finetuned": {
+    "correct": 299,
+    "total": 641
+  },
+  "neg_perplexity": {
+    "correct": 353,
+    "total": 641
+  },
+  "random": {
+    "correct": 308,
+    "total": 641
+  },
+  "oracle": {
+    "correct": 519,
+    "total": 641
+  },
+  "ensemble_text": {
+    "correct": 271,
+    "total": 641
+  },
+  "ensemble_unixcoder_ft": {
+    "correct": 299,
+    "total": 641
+  },
+  "ensemble_perplexity": {
+    "correct": 353,
+    "total": 641
+  }
+}

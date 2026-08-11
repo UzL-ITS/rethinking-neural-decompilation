@@ -1,0 +1,56 @@
+[
+  {
+    "beam_size": 1,
+    "total": 656,
+    "compile": 597,
+    "compile_rate": 91.0060975609756,
+    "pass": 314,
+    "pass_rate": 47.86585365853659,
+    "avg_time": 3.024912147260294
+  },
+  {
+    "beam_size": 2,
+    "total": 656,
+    "compile": 594,
+    "compile_rate": 90.54878048780488,
+    "pass": 332,
+    "pass_rate": 50.609756097560975,
+    "avg_time": 4.957403626747247
+  },
+  {
+    "beam_size": 4,
+    "total": 656,
+    "compile": 589,
+    "compile_rate": 89.78658536585365,
+    "pass": 340,
+    "pass_rate": 51.829268292682926,
+    "avg_time": 5.401488299776868
+  },
+  {
+    "beam_size": 8,
+    "total": 656,
+    "compile": 575,
+    "compile_rate": 87.65243902439023,
+    "pass": 339,
+    "pass_rate": 51.67682926829268,
+    "avg_time": 15.0812975691586
+  },
+  {
+    "beam_size": 16,
+    "total": 656,
+    "compile": 579,
+    "compile_rate": 88.26219512195121,
+    "pass": 345,
+    "pass_rate": 52.59146341463414,
+    "avg_time": 21.979418579398132
+  },
+  {
+    "beam_size": 32,
+    "total": 656,
+    "compile": 570,
+    "compile_rate": 86.89024390243902,
+    "pass": 341,
+    "pass_rate": 51.981707317073166,
+    "avg_time": 11.970545466353254
+  }
+]

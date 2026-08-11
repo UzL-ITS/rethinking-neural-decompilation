@@ -1,0 +1,56 @@
+[
+  {
+    "beam_size": 1,
+    "total": 1000,
+    "compile": 501,
+    "compile_rate": 50.1,
+    "pass": 333,
+    "pass_rate": 33.300000000000004,
+    "avg_time": 4.436289559125901
+  },
+  {
+    "beam_size": 2,
+    "total": 1000,
+    "compile": 483,
+    "compile_rate": 48.3,
+    "pass": 334,
+    "pass_rate": 33.4,
+    "avg_time": 6.231537672042847
+  },
+  {
+    "beam_size": 4,
+    "total": 1000,
+    "compile": 476,
+    "compile_rate": 47.599999999999994,
+    "pass": 348,
+    "pass_rate": 34.8,
+    "avg_time": 10.423544433116913
+  },
+  {
+    "beam_size": 8,
+    "total": 1000,
+    "compile": 494,
+    "compile_rate": 49.4,
+    "pass": 352,
+    "pass_rate": 35.199999999999996,
+    "avg_time": 14.086234434127807
+  },
+  {
+    "beam_size": 16,
+    "total": 1000,
+    "compile": 494,
+    "compile_rate": 49.4,
+    "pass": 366,
+    "pass_rate": 36.6,
+    "avg_time": 20.735938015460967
+  },
+  {
+    "beam_size": 32,
+    "total": 1000,
+    "compile": 478,
+    "compile_rate": 47.8,
+    "pass": 349,
+    "pass_rate": 34.9,
+    "avg_time": 6.853048492908478
+  }
+]

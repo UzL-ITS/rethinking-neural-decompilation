@@ -1,0 +1,20 @@
+# Core ML
+torch>=2.1.0
+transformers>=4.36.0
+datasets>=2.16.0
+numpy>=1.24.0
+
+# Inference (RQ2 candidate generation)
+vllm>=0.3.0
+
+# Code metrics (RQ2 evaluation)
+python-Levenshtein>=0.21.0
+codebleu>=0.7.0
+
+# AST parsing (RQ1 ablation)
+tree-sitter>=0.21.0
+tree-sitter-c>=0.21.0
+
+# Utilities
+tqdm>=4.65.0
+matplotlib>=3.7.0
