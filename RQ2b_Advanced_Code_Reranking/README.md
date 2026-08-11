@@ -5,7 +5,7 @@
 ## Setup
 
 - **Model**: LLM4Binary/llm4decompile-9b-v2
-- **Dataset**: decompile-eval (656 samples)
+- **Dataset**: decompile-eval (656 samples), Exebench (1000 samples)
 - **Candidates**: 200 per sample via temperature sampling (0.0, 0.3, 0.5, 0.7, 0.9, 1.0)
 - **Evaluation**: Functional correctness (compilation + test passing), Levenshtein similarity, CodeBLEU
 
@@ -44,6 +44,9 @@ python evaluate_all_metrics.py
 
 # Step 2b: Compute execution-guided reranking scores on the same candidate pool
 python selection_pipeline_execution_guided.py
+python selection_pipeline_mbr.py
+
+python 
 
 # Step 3: Evaluate all selection strategies
 python evaluate_selection.py
@@ -96,29 +99,28 @@ python evaluate_selection.py
 python export_to_tex.py
 ```
 
-
 | Selector | C1 | C2 | C3 | C4 | Avg. |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| *Oracle* | *92.7 ? 1.0* | *80.4 ? 0.6* | *86.8 ? 0.6* | *75.7 ? 1.6* | *83.9* |
-| Execution-Guided | 70.8 ? 0.4 | 51.8 ? 0.9 | **86.3 ? 0.8** | **75.4 ? 1.6** | **71.1** |
-| Neg. Perplexity | **73.3 ? 0.5** | 55.0 ? 1.2 | 70.4 ? 2.0 | 65.1 ? 2.8 | 66.0 |
-| MBR Consensus | 71.6 ? 0.5 | **51.9 ? 0.7** | 72.5 ? 1.2 | 62.3 ? 2.2 | 64.6 |
-| Majority Vote<sup>a</sup> | 71.2 ? 0.4 | 51.5 ? 0.6 | 72.2 ? 1.4 | 61.5 ? 2.5 | 64.1 |
-| Majority Vote<sup>b</sup> | 71.0 ? 0.5 | 51.5 ? 1.0 | 72.2 ? 1.7 | 61.6 ? 2.6 | 64.1 |
-| Trigram Similarity | 66.2 ? 1.3 | 51.6 ? 0.9 | 69.3 ? 0.5 | 60.9 ? 3.7 | 62.0 |
-| Random | 68.2 ? 1.2 | 47.0 ? 1.2 | 69.5 ? 1.4 | 59.4 ? 1.9 | 61.0 |
-| UniXcoder (Fine-tuned) | 66.8 ? 1.2 | 46.4 ? 0.7 | 68.0 ? 1.2 | 59.5 ? 3.2 | 60.2 |
-| Bigram Similarity | 65.7 ? 1.3 | 44.9 ? 1.1 | 69.0 ? 0.9 | 60.6 ? 3.4 | 60.0 |
-| RepE Correctness | 66.0 ? 2.3 | 45.3 ? 1.6 | 68.6 ? 1.1 | 58.8 ? 4.2 | 59.7 |
-| Ensemble (Text) | 66.5 ? 1.6 | 42.2 ? 0.7 | 68.9 ? 0.3 | 60.8 ? 3.5 | 59.6 |
-| Edit Similarity | 64.8 ? 1.9 | 43.0 ? 2.5 | 69.4 ? 1.2 | 61.4 ? 2.6 | 59.6 |
-| Identifier Similarity | 60.2 ? 0.9 | 46.8 ? 1.4 | 68.5 ? 1.6 | 61.6 ? 4.2 | 59.3 |
-| Token F1 | 64.2 ? 0.8 | 42.6 ? 1.2 | 67.9 ? 1.5 | 60.3 ? 3.1 | 58.8 |
-| AST Node Similarity | 61.0 ? 1.2 | 39.9 ? 1.5 | 67.9 ? 0.6 | 58.7 ? 3.3 | 56.9 |
-| UniXcoder (Base) | 62.1 ? 1.6 | 38.5 ? 0.9 | 67.5 ? 1.5 | 59.3 ? 3.5 | 56.9 |
-| Control Flow Similarity | 58.4 ? 2.3 | 35.9 ? 0.7 | 67.9 ? 1.4 | 61.5 ? 2.5 | 55.9 |
-| Majority Vote<sup>c</sup> | 65.2 ? 0.5 | 48.0 ? 0.3 | 37.4 ? 0.6 | 15.0 ? 0.2 | 41.4 |
-| Majority Vote<sup>d</sup> | 65.0 ? 0.4 | 47.8 ? 0.5 | 37.4 ? 0.8 | 14.9 ? 0.2 | 41.3 |
+| *Oracle* | *92.7 ± 1.0* | *80.4 ± 0.6* | *86.8 ± 0.6* | *75.7 ± 1.6* | *83.9* |
+| Execution-Guided | 70.8 ± 0.4 | 51.8 ± 0.9 | **86.3 ± 0.8** | **75.4 ± 1.6** | **71.1** |
+| Neg. Perplexity | **73.3 ± 0.5** | 55.0 ± 1.2 | 70.4 ± 2.0 | 65.1 ± 2.8 | 66.0 |
+| MBR Consensus | 71.6 ± 0.5 | **51.9 ± 0.7** | 72.5 ± 1.2 | 62.3 ± 2.2 | 64.6 |
+| Majority Vote<sup>a</sup> | 71.2 ± 0.4 | 51.5 ± 0.6 | 72.2 ± 1.4 | 61.5 ± 2.5 | 64.1 |
+| Majority Vote<sup>b</sup> | 71.0 ± 0.5 | 51.5 ± 1.0 | 72.2 ± 1.7 | 61.6 ± 2.6 | 64.1 |
+| Trigram Similarity | 66.2 ± 1.3 | 51.6 ± 0.9 | 69.3 ± 0.5 | 60.9 ± 3.7 | 62.0 |
+| Random | 68.2 ± 1.2 | 47.0 ± 1.2 | 69.5 ± 1.4 | 59.4 ± 1.9 | 61.0 |
+| UniXcoder (Fine-tuned) | 66.8 ± 1.2 | 46.4 ± 0.7 | 68.0 ± 1.2 | 59.5 ± 3.2 | 60.2 |
+| Bigram Similarity | 65.7 ± 1.3 | 44.9 ± 1.1 | 69.0 ± 0.9 | 60.6 ± 3.4 | 60.0 |
+| RepE Correctness | 66.0 ± 2.3 | 45.3 ± 1.6 | 68.6 ± 1.1 | 58.8 ± 4.2 | 59.7 |
+| Ensemble (Text) | 66.5 ± 1.6 | 42.2 ± 0.7 | 68.9 ± 0.3 | 60.8 ± 3.5 | 59.6 |
+| Edit Similarity | 64.8 ± 1.9 | 43.0 ± 2.5 | 69.4 ± 1.2 | 61.4 ± 2.6 | 59.6 |
+| Identifier Similarity | 60.2 ± 0.9 | 46.8 ± 1.4 | 68.5 ± 1.6 | 61.6 ± 4.2 | 59.3 |
+| Token F1 | 64.2 ± 0.8 | 42.6 ± 1.2 | 67.9 ± 1.5 | 60.3 ± 3.1 | 58.8 |
+| AST Node Similarity | 61.0 ± 1.2 | 39.9 ± 1.5 | 67.9 ± 0.6 | 58.7 ± 3.3 | 56.9 |
+| UniXcoder (Base) | 62.1 ± 1.6 | 38.5 ± 0.9 | 67.5 ± 1.5 | 59.3 ± 3.5 | 56.9 |
+| Control Flow Similarity | 58.4 ± 2.3 | 35.9 ± 0.7 | 67.9 ± 1.4 | 61.5 ± 2.5 | 55.9 |
+| Majority Vote<sup>c</sup> | 65.2 ± 0.5 | 48.0 ± 0.3 | 37.4 ± 0.6 | 15.0 ± 0.2 | 41.4 |
+| Majority Vote<sup>d</sup> | 65.0 ± 0.4 | 47.8 ± 0.5 | 37.4 ± 0.8 | 14.9 ± 0.2 | 41.3 |
 | **Related Work** *(Scores taken from publication)* | | | | | |
 | SK<sup>2</sup> Decompile | 69.0 | -- | -- | -- | 69.0 |
 | CodeInverter | -- | 62.1 | -- | -- | 62.1 |
@@ -131,7 +133,6 @@ python export_to_tex.py
 <sup>b</sup> Exact, Compile Only  
 <sup>c</sup> Normalized, All  
 <sup>d</sup> Exact, All
-
 
 
 ## Key Findings
