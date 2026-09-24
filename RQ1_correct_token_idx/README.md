@@ -1,87 +1,329 @@
 # RQ1: Token Rank Analysis for LLM4Decompile
 
-**RQ**: When LLM4Decompile predicts the wrong token, how far off is it? Is the correct token ranked 2nd, 10th, or 1000th in the model's output distribution?
+## Research Question
 
-## Setup
+When LLM4Decompile does not predict the correct next source-code token as its
+first choice, how highly is the correct token still ranked in the model's
+output distribution?
 
-- **Model**: LLM4Binary/llm4decompile-6.7b-v2
-- **Dataset**: LLM4Binary/decompile-eval (100 random samples, seed=42)
-- **Method**: Single forward pass per sample with teacher forcing (vectorized rank computation)
-- **Max target tokens**: 128 per sample
+The objective of RQ1 is to test whether the correct token is usually present
+within the model's top-5 predictions. We evaluate this question across two
+input representations, two datasets, and two LLM4Decompile models. We also use
+tree-sitter to identify which C token types are easiest and hardest for the
+models.
 
-## Pipeline
+## Configurations
 
+| ID | Input representation | Dataset | Model |
+|---|---|---|---|
+| C1 | Ghidra pseudo-code | HumanEval-Decompile | `LLM4Binary/llm4decompile-9b-v2` |
+| C2 | Assembly | HumanEval-Decompile | `LLM4Binary/llm4decompile-6.7b-v1.5` |
+| C3 | Ghidra/decompiler text | ExeBench | `LLM4Binary/llm4decompile-9b-v2` |
+| C4 | Assembly | ExeBench | `LLM4Binary/llm4decompile-6.7b-v1.5` |
+
+For each configuration, the experiment uses:
+
+- 100 samples
+- Random seed 42
+- At most 128 reference target tokens per sample
+- One teacher-forced model forward pass per sample
+- Vectorized rank computation over the model vocabulary
+
+## Method
+
+For every sample, the decompiler representation is inserted into the
+LLM4Decompile prompt and the original C function is used as the reference
+target:
+
+```text
+# This is the assembly code:
+<decompiler input>
+# What is the source code?
+<reference source function>
 ```
-Step 1:  token_rank_analysis.py  -> token_rank_data.npz + token_rank_analysis.png
+
+The prompt and reference target are tokenized separately and concatenated:
+
+```text
+[prompt tokens, target token 0, target token 1, ..., target token n-1]
 ```
 
-### Run:
-```bash
-cd v2/RQ1_correct_token_idx
-export CUDA_VISIBLE_DEVICES=2,3
-python token_rank_analysis.py
+With causal language modeling, the logits at position `i` predict the token at
+position `i + 1`. If `p` is the prompt length, logits beginning at `p - 1`
+therefore predict the reference target tokens. For each reference token `t_i`,
+the experiment computes:
+
+```text
+rank(t_i) = 1 + count(vocabulary tokens with a higher score than t_i)
 ```
 
-### Ablation (by AST node type):
-```bash
-python ablation/token_rank_by_nodetype.py
-```
+Interpretation:
 
-## Results
+- Rank 1: the correct token is the model's first choice.
+- Rank <= 5: the correct token is available within top-5 decoding.
+- Rank <= 10 or <= 100: the model assigns some probability to the correct
+  token, but ranks it below stronger alternatives.
+- Rank > 100: the correct token is poorly represented at that position.
 
-### Overall Token Rank Distribution (100 samples, 11,469 tokens)
+All target positions are evaluated in one vectorized GPU operation after the
+forward pass.
 
-| Metric | Value |
-|--------|-------|
-| Median rank | **1.0** |
-| Mean rank | 13.3 |
-| Rank = 1 (exact match) | **79.9%** |
-| Rank <= 5 | 93.0% |
-| Rank <= 10 | 95.3% |
-| Rank <= 100 | 98.8% |
-| Rank > 100 | 1.2% |
-| Rank > 1000 | 0.1% |
+### Teacher-Forcing Scope
 
-### Ablation: Hardest Token Types (by mean rank)
+This experiment evaluates next-token distributions under teacher forcing. At
+each position, the model receives the correct reference prefix, not its own
+previous generated tokens. The results therefore measure local token-level
+uncertainty and should not be interpreted as complete-program accuracy or
+functional correctness.
 
-| Node Type | Mean Rank | Median | Exact Match | Count |
-|-----------|-----------|--------|-------------|-------|
-| comment | 140.4 | 1.0 | 50.9% | 529 |
-| unary_op | 61.6 | 1.0 | 81.5% | 27 |
-| keyword_qualifier | 39.2 | 2.0 | 44.4% | 108 |
-| type_identifier | 21.9 | 1.0 | 69.7% | 765 |
-| identifier | 11.2 | 1.0 | 77.6% | 4163 |
+## Token-Type Ablation
 
-### Ablation: Easiest Token Types (100% exact match)
+The ablation parses each reference C function with tree-sitter and maps each
+decoded model token to a C syntax category. It reports the following for every
+node type:
 
-escape_sequence, character, defined, #endif (all median=1, mean=1)
+- Number of mapped tokens
+- Median and mean rank
+- Rank-1 percentage
+- Top-5 and top-10 percentages
+- Percentage with rank greater than 100 or 1,000
 
-## Files
+Examples of categories include `identifier`, `type_identifier`,
+`keyword_qualifier`, `primitive_type`, `arithmetic_op`, `paren`, `brace`,
+`comment`, and `string_literal`.
 
-```
+## Repository Layout
+
+The publication artifact contains source code and notebooks only:
+
+```text
 RQ1_correct_token_idx/
-├── README.md
-├── token_rank_analysis.py       # Main experiment: rank of correct token per position
-├── token_rank_analysis.png      # 4-panel plot (median by position, histogram, CDF)
-├── token_rank_data.npz          # Raw numpy data (ranks by position)
-└── ablation/
-    ├── token_rank_by_nodetype.py    # Breakdown by tree-sitter AST node type
-    ├── token_rank_by_nodetype.png   # Node-type visualization
-    └── token_rank_by_nodetype.json  # Per-node-type statistics (41 types)
+|- README.md
+|- token_rank_analysis.py
+|- ablation/
+|  `- token_rank_by_nodetype.py
+`- solution/
+   |- token_rank_analysis_rq1_c1_c2.ipynb
+   |- exebench_token_analysis_rq1_c3_c4.ipynb
+   |- token_ablation_c1.ipynb
+   |- token_ablation_c2.ipynb
+   |- token_ablation_c3.ipynb
+   `- token_ablation_c4.ipynb
 ```
+
+The two overall-analysis notebooks contain the configuration-specific token
+rank experiments. The four ablation notebooks contain the corresponding
+tree-sitter analyses. The root Python files provide standalone versions of the
+core rank and node-type analysis logic.
+
+Generated images, NPZ arrays, JSON summaries, and executed notebook outputs are
+not included in the code-only artifact.
+
+## Requirements
+
+Recommended environment:
+
+- Python 3.10+
+- CUDA-capable GPU
+- PyTorch
+- Transformers
+- Datasets
+- NumPy
+- Pandas
+- Matplotlib
+- tqdm
+- Requests
+- Jupyter
+- tree-sitter and the tree-sitter C grammar
+
+Example installation:
+
+```bash
+python -m pip install torch transformers datasets numpy pandas matplotlib \
+  tqdm requests jupyter tree-sitter tree-sitter-c
+```
+
+The 9B model requires more GPU memory than the 6.7B model. The notebooks use
+`float16` or `bfloat16` and should be run one configuration at a time.
+
+## Dataset Preparation
+
+### C1: HumanEval-Decompile Ghidra
+
+The C1 notebook loads `LLM4Binary/decompile-eval` from Hugging Face and uses:
+
+```text
+input:  ghidra_pseudo
+target: func
+```
+
+### C2: HumanEval-Decompile Assembly
+
+The C2 overall experiment uses
+`decompile-eval-executable-gcc-obj.json` and reads:
+
+```text
+input:  input_asm_prompt
+target: c_func
+```
+
+Update the JSON URL or local path in
+`solution/token_rank_analysis_rq1_c1_c2.ipynb` if necessary.
+
+### C3 and C4: ExeBench
+
+The ExeBench notebook currently loads a local Arrow shard. Update this path:
+
+```python
+Dataset.from_file("/path/to/exebench/data-00000-of-00004.arrow")
+```
+
+The configuration fields used by the notebooks are:
+
+```text
+C3 input:  c_code_unobf
+C4 input:  assembly_unobf
+target:    org_function
+```
+
+The local ExeBench data must provide these fields before the notebooks are run.
+
+## Running the Experiment
+
+From the repository root:
+
+```bash
+cd RQ1_correct_token_idx
+export CUDA_VISIBLE_DEVICES=0
+jupyter lab
+```
+
+Run the notebooks in this order:
+
+```text
+1. solution/token_rank_analysis_rq1_c1_c2.ipynb
+   - Run the C1 cells with the 9B-v2 model.
+   - Release GPU memory.
+   - Run the C2 cells with the 6.7B-v1.5 model.
+
+2. solution/exebench_token_analysis_rq1_c3_c4.ipynb
+   - Run C3 with ExeBench decompiler text and the 9B-v2 model.
+   - Release GPU memory.
+   - Run C4 with ExeBench assembly and the 6.7B-v1.5 model.
+
+3. solution/token_ablation_c1.ipynb
+4. solution/token_ablation_c2.ipynb
+5. solution/token_ablation_c3.ipynb
+6. solution/token_ablation_c4.ipynb
+```
+
+Before running, replace the absolute dataset and output paths in the notebooks
+with paths valid for the local environment.
+
+### C4 Code Check
+
+The current saved `exebench_token_analysis_rq1_c3_c4.ipynb` contains the C3
+overall-analysis code but does not retain the complete C4 overall-analysis
+cell. Before submitting the code artifact, restore the C4 cell using:
+
+```text
+model:  LLM4Binary/llm4decompile-6.7b-v1.5
+input:  assembly_unobf
+target: org_function
+output: output_rq1_c4
+```
+
+Without that cell, the C4 result is documented but cannot be regenerated from
+the submitted notebook.
+
+## Generated Outputs
+
+Each overall token-rank run generates:
+
+```text
+token_rank_analysis.png
+token_rank_data.npz
+```
+
+The NPZ file contains:
+
+```text
+positions
+median_ranks
+mean_ranks
+min_ranks
+max_ranks
+all_ranks
+```
+
+Each tree-sitter ablation generates:
+
+```text
+token_rank_by_nodetype.png
+token_rank_by_nodetype.json
+```
+
+These files are runtime artifacts and are intentionally excluded from the
+code-only publication repository.
+
+## Unified Token-Rank Results
+
+The central RQ1 result is that the correct token is within the top five for at
+least 93.7% of evaluated positions in every configuration.
+
+| Config | Evaluated tokens | Median rank | Rank = 1 | Rank <= 5 | Rank <= 10 | Rank <= 100 |
+|---|---:|---:|---:|---:|---:|---:|
+| C1 | 11,441 | 1.0 | 80.9% | 93.7% | 95.6% | 98.7% |
+| C2 | 11,208 | 1.0 | 87.5% | 97.2% | 97.9% | 99.0% |
+| C3 | 9,071 | 1.0 | 87.3% | 97.1% | 98.1% | 99.4% |
+| C4 | 9,027 | 1.0 | 82.3% | 94.6% | 96.2% | 98.7% |
+
+The top-5 result directly answers RQ1:
+
+```text
+Minimum top-5 coverage across C1-C4: 93.7%
+Maximum top-5 coverage across C1-C4: 97.2%
+```
+
+## Unified Token-Type Ablation Results
+
+The following values come from the four tree-sitter ablation runs:
+
+| Config | Mapped tokens | Mean rank | Median rank | Rank = 1 | Rank <= 10 |
+|---|---:|---:|---:|---:|---:|
+| C1 | 11,441 | 10.27 | 1.0 | 80.6% | 95.6% |
+| C2 | 11,469 | 10.38 | 1.0 | 77.0% | 94.3% |
+| C3 | 9,071 | 5.96 | 1.0 | 87.1% | 98.1% |
+| C4 | 9,027 | 10.08 | 1.0 | 82.2% | 96.2% |
+
+Token types with the highest mean ranks among categories with at least 50
+observations were:
+
+| Config | Harder token types |
+|---|---|
+| C1 | `keyword_qualifier`, `comment`, `type_identifier`, `identifier` |
+| C2 | `comment`, `keyword_qualifier`, `type_identifier`, `identifier` |
+| C3 | `keyword_qualifier`, `identifier`, `preproc_arg` |
+| C4 | `keyword_qualifier`, `identifier`, `keyword_control` |
+
+Structural categories such as parentheses, commas, braces, arithmetic
+operators, and newlines generally have low mean ranks and high top-10 rates.
+Identifiers and qualifiers are harder because their correct form depends more
+strongly on program-specific semantics and naming choices.
 
 ## Key Findings
 
-1. **The model is mostly right**: 79.9% of tokens are predicted exactly (rank 1)
-2. **When wrong, usually close**: 93.0% of tokens are in the top 5
-3. **Only 1.2% are truly wrong** (rank > 100), suggesting the model understands code structure
-4. **Comments are hardest** (mean rank 140.4) - model struggles with free-form text in code
-5. **Identifiers are the biggest challenge at scale**: though 77.6% exact, they represent 36% of all tokens
-6. **Structural tokens are easy**: brackets, semicolons, keywords have near-perfect prediction
+1. **The correct token is usually in the top five.** Top-5 coverage ranges from
+   93.7% to 97.2% across all configurations.
+2. **The correct token is most often ranked first.** Rank-1 accuracy ranges
+   from 80.9% to 87.5%.
+3. **Severe token-ranking failures are uncommon.** At least 98.7% of reference
+   tokens are ranked within the top 100.
+4. **The result generalizes across representations and datasets.** Both Ghidra
+   and assembly inputs show high top-5 coverage on HumanEval-Decompile and
+   ExeBench.
+5. **Semantic token categories are harder than structural syntax.** Identifiers,
+   qualifiers, and comments produce larger rank errors than common punctuation
+   and operators.
 
-## Method Details
 
-For each sample, we concatenate `[prompt_tokens, target_tokens]` and run a single forward pass.
-The logits at position `prompt_len-1` through `prompt_len-1+target_len` predict the target tokens (teacher forcing).
-For each position, we compute `rank = 1 + count(tokens with higher probability than correct token)`.
-This is fully vectorized on GPU, making it ~100x faster than per-token forward passes.
